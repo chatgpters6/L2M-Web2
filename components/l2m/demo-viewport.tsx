@@ -6,6 +6,7 @@ import { FitWidth } from './fit-width'
 import { AfterDesktop, AfterMobile, BeforeDesktop, type HotspotProps } from './demo-sites'
 import { DemoBadge } from './brand'
 import { useLang } from '@/lib/i18n'
+import { DEMO_COMPANY } from '@/lib/demo-facts'
 import { cn } from '@/lib/utils'
 
 export type View = 'before' | 'after'
@@ -34,7 +35,7 @@ export function DemoViewport({
 }) {
   const { t } = useLang()
   const h: HotspotProps = { ...hotspots, showHotspots: view === 'after' && hotspots?.showHotspots }
-  const address = view === 'after' ? 'hartwell-demo.example' : 'www.hartwell-demo.example/index.html'
+  const address = view === 'after' ? DEMO_COMPANY.domain : `${DEMO_COMPANY.legacyHost}/index.html`
   const label = `${view === 'after' ? t.flagship.after : t.flagship.before} — ${t.flagship.placeholder}`
 
   if (device === 'mobile') {

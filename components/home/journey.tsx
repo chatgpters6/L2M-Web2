@@ -3,15 +3,16 @@
 import { useState, type FormEvent } from 'react'
 import { Check, FileText, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import {
+  DEMO_APPLICATIONS,
+  DEMO_COMPANY,
+  DEMO_PRODUCT,
+  demoApplication,
+  demoDatasheetLabel,
+  demoInquiryChip,
+  demoInquiryContext,
+} from '@/lib/demo-facts'
 import { SectionIntro, useHomeCopy } from './home-state'
-
-const APPS = ['Water treatment', 'Chemical processing', 'Food & beverage', 'HVAC & building'] as const
-const APP_ZH: Record<string, string> = {
-  'Water treatment': '水处理',
-  'Chemical processing': '化工',
-  'Food & beverage': '食品饮料',
-  'HVAC & building': '暖通与楼宇',
-}
 
 export function Journey() {
   const { h, lang } = useHomeCopy()
@@ -84,7 +85,7 @@ export function Journey() {
 
           <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-ink/15 bg-site-bg text-site-ink shadow-xl shadow-ink/10">
             <div className="flex items-center justify-between gap-3 border-b border-ink/10 bg-site-soft px-4 py-2.5">
-              <span className="truncate font-mono text-xs text-site-ink/70">hartwell-demo.example</span>
+              <span className="truncate font-mono text-xs text-site-ink/70">{DEMO_COMPANY.domain}</span>
               <span className="shrink-0 rounded-sm border border-ink/30 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider">
                 {h.path.demo}
               </span>
@@ -103,22 +104,22 @@ export function Journey() {
 
 function DiscoverMock({ lang }: { lang: 'en' | 'zh' }) {
   const { h } = useHomeCopy()
-  const [app, setApp] = useState<string>(APPS[0])
+  const [app, setApp] = useState<string>(DEMO_PRODUCT.applicationKey)
   return (
     <div className="flex flex-col gap-5">
       <fieldset className="flex flex-col gap-3">
         <legend className="mb-3 text-sm font-semibold">{h.journey.appsLabel}</legend>
         <div className="flex flex-wrap gap-2">
-          {APPS.map((a) => (
+          {DEMO_APPLICATIONS.map((a) => (
             <label
-              key={a}
+              key={a.key}
               className={cn(
                 'inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 text-sm font-medium has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink',
-                app === a ? 'border-site-brand bg-site-brand text-site-bg' : 'border-site-ink/25 hover:border-site-ink',
+                app === a.key ? 'border-site-brand bg-site-brand text-site-bg' : 'border-site-ink/25 hover:border-site-ink',
               )}
             >
-              <input type="radio" name="journey-app" value={a} checked={app === a} onChange={() => setApp(a)} className="sr-only" />
-              {lang === 'zh' ? APP_ZH[a] : a}
+              <input type="radio" name="journey-app" value={a.key} checked={app === a.key} onChange={() => setApp(a.key)} className="sr-only" />
+              {a.name[lang]}
             </label>
           ))}
         </div>
@@ -126,9 +127,9 @@ function DiscoverMock({ lang }: { lang: 'en' | 'zh' }) {
       <div aria-live="polite" className="flex flex-col gap-2">
         <p className="font-mono text-[11px] uppercase tracking-wider text-site-ink/60">{h.journey.families}</p>
         <ul className="grid gap-2 sm:grid-cols-2">
-          {h.journey.familyNames[app].map((f) => (
-            <li key={f} className="flex items-center justify-between rounded-md border border-site-ink/15 bg-site-soft/60 px-4 py-3 text-sm font-medium">
-              {f}
+          {demoApplication(app).families.map((f) => (
+            <li key={f.en} className="flex items-center justify-between rounded-md border border-site-ink/15 bg-site-soft/60 px-4 py-3 text-sm font-medium">
+              {f[lang]}
               <span aria-hidden="true" className="text-site-ink/40">
                 →
               </span>
@@ -142,27 +143,16 @@ function DiscoverMock({ lang }: { lang: 'en' | 'zh' }) {
 
 function EvaluateMock() {
   const { lang } = useHomeCopy()
-  const zh = lang === 'zh'
-  const specs: [string, string][] = zh
-    ? [
-        ['通径', 'DN50 – DN300'],
-        ['压力等级', 'PN16 / PN40'],
-        ['阀体材质', '球墨铸铁 / 316 不锈钢'],
-        ['连接方式', '对夹 / 法兰'],
-      ]
-    : [
-        ['Size', 'DN50 – DN300'],
-        ['Pressure rating', 'PN16 / PN40'],
-        ['Body material', 'Ductile iron / 316 SS'],
-        ['Connection', 'Wafer / Flanged'],
-      ]
+  const specs: [string, string][] = DEMO_PRODUCT.specs.map((s) => [s.label[lang], s.value[lang]])
   return (
     <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-      <img src="/demo/valve.png" alt="" className="aspect-square w-28 shrink-0 rounded-md bg-site-soft object-cover sm:w-36" />
+      <img src={DEMO_PRODUCT.image} alt="" className="aspect-square w-28 shrink-0 rounded-md bg-site-soft object-cover sm:w-36" />
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <div>
-          <p className="font-mono text-xs text-site-ink/60">H-200</p>
-          <p className="text-lg font-semibold">{zh ? '高性能蝶阀' : 'High-performance butterfly valve'}</p>
+          <p className="font-mono text-xs text-site-ink/60">
+            {demoApplication().name[lang]} · {DEMO_PRODUCT.category[lang]}
+          </p>
+          <p className="text-lg font-semibold">{DEMO_PRODUCT.name[lang]}</p>
         </div>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
           {specs.map(([k, v]) => (
@@ -174,7 +164,7 @@ function EvaluateMock() {
         </dl>
         <span className="inline-flex w-fit items-center gap-2 text-sm font-medium text-site-ink/75">
           <FileText className="size-4" aria-hidden="true" />
-          {zh ? '规格书 PDF · 2.3MB' : 'Datasheet PDF · 2.3MB'}
+          {demoDatasheetLabel(lang)}
         </span>
       </div>
     </div>
@@ -184,8 +174,7 @@ function EvaluateMock() {
 function ActMock() {
   const { h, lang } = useHomeCopy()
   const [sent, setSent] = useState(false)
-  const zh = lang === 'zh'
-  const context = zh ? ['型号：H-200 高性能蝶阀', '尺寸：DN150', '来源页面：产品页'] : ['Model: H-200 butterfly valve', 'Size: DN150', 'Started from: product page']
+  const context = demoInquiryContext(lang)
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -219,11 +208,8 @@ function ActMock() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-2">
-        {context.slice(0, 2).map((c) => (
-          <span key={c} className="rounded-full bg-site-brand px-3 py-1 text-xs font-semibold text-site-bg">
-            {c}
-          </span>
-        ))}
+        <span className="rounded-full bg-site-brand px-3 py-1 text-xs font-semibold text-site-bg">{demoInquiryChip(lang)}</span>
+        <span className="rounded-full border border-site-ink/20 px-3 py-1 text-xs font-semibold">{demoApplication().name[lang]}</span>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {[h.journey.fieldName, h.journey.fieldEmail].map((label, i) => (

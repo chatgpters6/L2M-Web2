@@ -43,7 +43,7 @@ export function SiteHeader({
   const links = labels.map((label, i) => ({ label, href: anchors?.[i] }))
   const menuId = `${inputId}-menu`
 
-  const linkCls = cn('underline-offset-4 hover:underline focus-visible:outline-2', dark ? 'text-ivory/80' : 'text-ink/80')
+  const linkCls = cn('inline-flex min-h-11 items-center underline-offset-4 hover:underline focus-visible:outline-2', dark ? 'text-ivory/80' : 'text-ink/80')
 
   return (
     <header className={cn('relative', dark ? 'bg-ink text-ivory' : 'border-b border-ink/10 bg-ivory text-ink')}>
@@ -68,7 +68,7 @@ export function SiteHeader({
             href="#"
             onClick={(e) => e.preventDefault()}
             title={t.nav.navDemo}
-            className={cn('hidden text-sm font-medium md:inline', dark ? 'text-ivory/80' : 'text-ink/80')}
+            className={cn('hidden min-h-11 items-center text-sm font-medium md:inline-flex', dark ? 'text-ivory/80' : 'text-ink/80')}
           >
             {t.nav.signIn}
           </a>

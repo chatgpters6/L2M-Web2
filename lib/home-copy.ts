@@ -1,4 +1,5 @@
 import type { Lang } from './i18n'
+import { DEMO_APPLICATIONS, DEMO_COMPANY, DEMO_LEGACY_PRODUCTS, DEMO_PRODUCT, demoSpec } from './demo-facts'
 
 export type JourneyStep = { key: 'discover' | 'evaluate' | 'act'; label: string; buyer: string; page: string; value: string }
 export type Finding = {
@@ -11,6 +12,12 @@ export type Finding = {
 }
 export type Stage = { name: string; summary: string; points: string[] }
 export type ProofRow = { evidence: string; check: string; status: string }
+
+const HOST = DEMO_COMPANY.legacyHost
+const APP_COUNT = DEMO_APPLICATIONS.length
+const LEGACY_COUNT = DEMO_LEGACY_PRODUCTS.length
+const PDF_SIZE = DEMO_PRODUCT.datasheet.size
+const PRESSURE = demoSpec('pressure').value.en
 
 const en = {
   proto: 'Design prototype · Not a production website · All cases shown are fictional demos',
@@ -68,12 +75,6 @@ const en = {
     ] as JourneyStep[],
     appsLabel: 'Application',
     families: 'Matching product families',
-    familyNames: {
-      'Water treatment': ['Butterfly valves', 'Check valves', 'Gate valves'],
-      'Chemical processing': ['Ball valves (316 SS)', 'Check valves', 'Sampling valves'],
-      'Food & beverage': ['Sanitary ball valves', 'Butterfly valves'],
-      'HVAC & building': ['Balancing valves', 'Butterfly valves', 'Strainers'],
-    } as Record<string, string[]>,
     sendDemo: 'Send inquiry',
     notSent: 'DEMO — nothing was sent. On a live site, sales would receive the request with this context attached:',
     reset: 'Reset',
@@ -97,12 +98,13 @@ const en = {
     findingsLabel: 'Select a finding',
     observed: 'What we observed',
     evidence: 'Page evidence',
+    snippetLabel: 'Page excerpt — reconstructed from the sample site',
     why: 'Why it matters',
     recommendation: 'Recommended upgrade',
     confirmHeading: 'Needs your confirmation',
     confirm: [
-      'Are these four applications still the markets you serve?',
-      'Does the PN40 rating apply to every H-200 size?',
+      `Are these ${APP_COUNT} applications still the markets you serve?`,
+      `Does the ${PRESSURE} rating apply to every ${DEMO_PRODUCT.model} size?`,
       'Who on your team should receive product inquiries?',
     ],
     unknownHeading: 'Not assessed',
@@ -111,23 +113,23 @@ const en = {
       {
         tag: 'Discover',
         title: 'Products are only reachable by model number',
-        page: 'www.hartwell-demo.example/index.html',
-        observed: 'The catalog is a sidebar of 14 model codes with no applications, categories or descriptions.',
+        page: `${HOST}/index.html`,
+        observed: `The catalog is a sidebar of ${LEGACY_COUNT} model codes with no applications, categories or descriptions.`,
         why: 'A buyer who doesn’t already know the model code has no route to a relevant product.',
         recommendation: 'Organize products by application first, then by product family.',
       },
       {
         tag: 'Evaluate',
         title: 'Key specifications exist only inside a PDF',
-        page: 'www.hartwell-demo.example/index.html#download',
-        observed: 'Size, pressure rating and material are only available in a 2.3MB download.',
+        page: `${HOST}/index.html#download`,
+        observed: `Size, pressure rating and material are only available in a ${PDF_SIZE} download.`,
         why: 'Buyers must download a file before they can check whether a valve fits their line.',
         recommendation: 'Summarize the deciding specifications on the product page and keep the datasheet as a download.',
       },
       {
         tag: 'Act',
         title: 'Contact carries no product context',
-        page: 'www.hartwell-demo.example/contact.html',
+        page: `${HOST}/contact.html`,
         observed: 'Contact is phone, fax and a general email address in the footer.',
         why: 'Every inquiry starts from zero; sales has to ask what the buyer is looking at.',
         recommendation: 'Start inquiries from the product page with model and size attached.',
@@ -135,7 +137,7 @@ const en = {
       {
         tag: 'Experience',
         title: 'The layout does not adapt to phones',
-        page: 'www.hartwell-demo.example/index.html',
+        page: `${HOST}/index.html`,
         observed: 'Fixed 1000px layout; the footer says “Best viewed at 1024×768”.',
         why: 'On a phone the page is shrunk until text and links are too small to use.',
         recommendation: 'Rebuild the layout so content reflows for phones and tablets.',
@@ -181,6 +183,10 @@ const en = {
     eyebrow: 'What You Get',
     title: 'A better website. Ready for your business.',
     lede: 'You are buying an upgraded website — not server space, not a template.',
+    showcaseLabel: 'Fictional DEMO website — illustrates the format, not a customer delivery',
+    desktopLabel: 'Desktop',
+    mobileLabel: 'Mobile',
+    deviceNote: 'One site, one structure, on every screen.',
     values: [
       ['Visual & brand', 'A modern design that keeps your business recognizable.'],
       ['Content structure', 'Your products and facts, organized around how buyers decide.'],
@@ -200,6 +206,27 @@ const en = {
     eyebrow: 'Proof & Trust',
     title: 'See the work. Know what you’ll get.',
     lede: 'Every claim on this site should be checkable. Here is what will be published — and what isn’t available yet.',
+    pillars: [
+      {
+        name: 'Verified work',
+        promise: 'Real Before / After transformations of the same company, with source, snapshot date and written authorization.',
+        detail: 'Every published case links to the live site so you can check it yourself.',
+        status: 'Awaiting first authorized case',
+      },
+      {
+        name: 'Clear delivery boundaries',
+        promise: 'A passing technical build and an accepted delivery are reported separately — you sign off on what you receive.',
+        detail: 'What is included, what needs a service and what is out of scope are stated before you pay.',
+        status: 'Draft terms — not published',
+      },
+      {
+        name: 'You stay in control',
+        promise: 'Your current website is never modified. You receive rebuildable source and can move out at any time.',
+        detail: 'Your company, product and contact facts are confirmed by you before anything goes live.',
+        status: 'Defined for the product phase',
+      },
+    ],
+    reviewNotes: 'Prototype review notes — evidence status',
     colEvidence: 'Evidence',
     colCheck: 'What you’ll be able to check',
     colStatus: 'Status in this prototype',
@@ -278,12 +305,6 @@ const zh: HomeCopy = {
     ],
     appsLabel: '应用场景',
     families: '匹配的产品系列',
-    familyNames: {
-      'Water treatment': ['蝶阀', '止回阀', '闸阀'],
-      'Chemical processing': ['球阀（316 不锈钢）', '止回阀', '取样阀'],
-      'Food & beverage': ['卫生级球阀', '蝶阀'],
-      'HVAC & building': ['平衡阀', '蝶阀', '过滤器'],
-    },
     sendDemo: '发送询盘',
     notSent: '演示 — 没有发送任何内容。在正式网站上，销售会收到附带以下信息的请求：',
     reset: '重置',
@@ -307,33 +328,38 @@ const zh: HomeCopy = {
     findingsLabel: '选择一条发现',
     observed: '观察到的情况',
     evidence: '页面证据',
+    snippetLabel: '页面片段 — 根据示例网站示意重建',
     why: '为何重要',
     recommendation: '建议升级',
     confirmHeading: '需要你确认',
-    confirm: ['这四个应用场景仍是你们服务的市场吗？', 'PN40 压力等级是否适用于所有 H-200 尺寸？', '团队中由谁接收产品询盘？'],
+    confirm: [
+      `这 ${APP_COUNT} 个应用场景仍是你们服务的市场吗？`,
+      `${PRESSURE} 压力等级是否适用于所有 ${DEMO_PRODUCT.model} 尺寸？`,
+      '团队中由谁接收产品询盘？',
+    ],
     unknownHeading: '未评估',
     unknown: ['访客流量与询盘数量 — 未测量。', '搜索排名影响 — 未评估，也不作承诺。'],
     findings: [
       {
         tag: '发现',
         title: '产品只能通过型号找到',
-        page: 'www.hartwell-demo.example/index.html',
-        observed: '产品目录是侧栏中的 14 个型号代码，没有应用场景、分类或说明。',
+        page: `${HOST}/index.html`,
+        observed: `产品目录是侧栏中的 ${LEGACY_COUNT} 个型号代码，没有应用场景、分类或说明。`,
         why: '不知道型号的买家，没有任何路径找到相关产品。',
         recommendation: '先按应用场景组织产品，再细分到产品系列。',
       },
       {
         tag: '评估',
         title: '关键规格只存在于 PDF 中',
-        page: 'www.hartwell-demo.example/index.html#download',
-        observed: '尺寸、压力等级与材质只能在一个 2.3MB 的下载文件中找到。',
+        page: `${HOST}/index.html#download`,
+        observed: `尺寸、压力等级与材质只能在一个 ${PDF_SIZE} 的下载文件中找到。`,
         why: '买家必须先下载文件，才能判断阀门是否适配产线。',
         recommendation: '在产品页直接概括关键规格，规格书保留为下载项。',
       },
       {
         tag: '行动',
         title: '联系方式不带任何产品信息',
-        page: 'www.hartwell-demo.example/contact.html',
+        page: `${HOST}/contact.html`,
         observed: '联系方式只有页脚中的电话、传真和通用邮箱。',
         why: '每次询盘都从零开始，销售需要先问买家在看什么产品。',
         recommendation: '从产品页发起询盘，自动带入型号和尺寸。',
@@ -341,7 +367,7 @@ const zh: HomeCopy = {
       {
         tag: '体验',
         title: '页面布局不适配手机',
-        page: 'www.hartwell-demo.example/index.html',
+        page: `${HOST}/index.html`,
         observed: '固定 1000px 布局，页脚写着「建议使用 1024×768 浏览」。',
         why: '在手机上页面被缩小，文字和链接小到无法使用。',
         recommendation: '重建页面布局，让内容在手机和平板上自适应排列。',
@@ -371,6 +397,10 @@ const zh: HomeCopy = {
     eyebrow: '你将获得',
     title: '一套全新的网站。一次真正的升级。',
     lede: '你购买的是升级后的网站，而不是服务器空间或模板。',
+    showcaseLabel: '虚构 DEMO 网站 — 用于展示交付形态，并非客户交付成果',
+    desktopLabel: '桌面端',
+    mobileLabel: '手机端',
+    deviceNote: '同一套网站、同一套结构，适配每一块屏幕。',
     values: [
       ['视觉与品牌', '现代化设计，同时保留企业的辨识度。'],
       ['内容结构', '你的产品与事实，围绕买家决策方式重新组织。'],
@@ -390,6 +420,27 @@ const zh: HomeCopy = {
     eyebrow: '证据与信任',
     title: '看得见作品，也看得清交付。',
     lede: '本网站上的每一项说法都应能被核实。以下是将会公开的内容，以及目前尚未具备的部分。',
+    pillars: [
+      {
+        name: '可核实的作品',
+        promise: '同一企业真实的改造前后对比，附来源、快照日期与书面授权。',
+        detail: '每个公开案例都链接到线上网站，你可以自己核实。',
+        status: '等待首个授权案例',
+      },
+      {
+        name: '清晰的交付边界',
+        promise: '技术构建通过与商业交付验收分开报告 — 由你确认最终收到的内容。',
+        detail: '付款前就写明包含什么、哪些依赖服务、哪些不在范围内。',
+        status: '条款草稿 — 尚未发布',
+      },
+      {
+        name: '控制权在你手中',
+        promise: '不会修改你现有的网站。你获得可重建的源码，随时可以迁出。',
+        detail: '企业、产品与联系信息在上线前由你本人确认。',
+        status: '将在产品阶段定义',
+      },
+    ],
+    reviewNotes: '原型评审说明 — 证据状态',
     colEvidence: '证据',
     colCheck: '你将能核实什么',
     colStatus: '本原型中的状态',

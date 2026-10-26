@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { CircleHelp, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { DEMO_COMPANY, DEMO_LEGACY_PRODUCTS, DEMO_PRODUCT } from '@/lib/demo-facts'
 import { SectionIntro, useHomeCopy } from './home-state'
 
 export function Report() {
@@ -20,7 +21,7 @@ export function Report() {
           <header className="flex flex-col gap-2 border-b border-ink/15 bg-ink px-5 py-4 text-ivory sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col">
               <span className="text-sm font-semibold">{r.windowTitle}</span>
-              <span className="font-mono text-xs text-ivory/65">hartwell-demo.example</span>
+              <span className="font-mono text-xs text-ivory/65">{DEMO_COMPANY.domain}</span>
             </div>
             <span className="w-fit rounded-sm border border-lime px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-lime">
               {r.sample}
@@ -67,6 +68,15 @@ export function Report() {
                 <span className="font-mono text-[11px] uppercase tracking-wider text-ink/60">{f.tag}</span>
                 <h3 className="text-balance text-2xl font-semibold leading-tight">{f.title}</h3>
               </div>
+              <figure className="flex flex-col gap-2">
+                <div className="overflow-hidden rounded-md border border-ink/20 bg-legacy-bg">
+                  <div className="flex items-center gap-2 border-b border-ink/15 bg-ink/[0.06] px-3 py-1.5">
+                    <span className="min-w-0 truncate font-mono text-[11px] text-ink/70">{f.page}</span>
+                  </div>
+                  <EvidenceSnippet index={active} />
+                </div>
+                <figcaption className="font-mono text-[11px] uppercase tracking-wider text-ink/55">{r.snippetLabel}</figcaption>
+              </figure>
               <dl className="grid gap-5 md:grid-cols-2">
                 <div className="flex flex-col gap-1">
                   <dt className="text-sm font-semibold">{r.observed}</dt>
@@ -116,5 +126,78 @@ export function Report() {
         </article>
       </div>
     </section>
+  )
+}
+
+/** The flagged region is outlined; everything else on the legacy page is dimmed. */
+function Flag({ children, className }: { children: ReactNode; className?: string }) {
+  return <div className={cn('relative rounded-sm outline-2 outline-offset-2 outline-ink outline-dashed', className)}>{children}</div>
+}
+
+function EvidenceSnippet({ index }: { index: number }) {
+  const legacy = 'font-[Verdana,Arial,sans-serif] text-[12px] leading-snug text-ink'
+  if (index === 0) {
+    return (
+      <div className={cn('flex gap-4 p-4', legacy)}>
+        <Flag className="w-36 shrink-0 bg-legacy-bg">
+          <div className="bg-legacy-bar px-2 py-1 font-bold text-ivory">Products</div>
+          <ul className="flex flex-col gap-0.5 px-2 py-1.5">
+            {DEMO_LEGACY_PRODUCTS.slice(0, 7).map((p) => (
+              <li key={p} className="text-legacy-link underline">{p}</li>
+            ))}
+            <li className="text-ink/50">…</li>
+          </ul>
+        </Flag>
+        <div aria-hidden="true" className="flex flex-1 flex-col gap-2 opacity-40">
+          <div className="h-3 w-2/3 bg-legacy-line" />
+          <div className="h-2 w-full bg-legacy-line" />
+          <div className="h-2 w-5/6 bg-legacy-line" />
+          <div className="h-16 w-full border border-legacy-line" />
+        </div>
+      </div>
+    )
+  }
+  if (index === 1) {
+    return (
+      <div className={cn('flex flex-col gap-3 p-4', legacy)}>
+        <div aria-hidden="true" className="flex flex-col gap-1.5 opacity-40">
+          <div className="h-3 w-1/3 bg-legacy-line" />
+          <div className="h-2 w-3/4 bg-legacy-line" />
+        </div>
+        <Flag className="w-fit px-2 py-1">
+          <span className="text-legacy-link underline">
+            Download {DEMO_PRODUCT.datasheet.file}
+          </span>{' '}
+          <span className="text-ink/60">({DEMO_PRODUCT.datasheet.size})</span>
+        </Flag>
+        <p className="text-ink/50">No specifications shown on this page.</p>
+      </div>
+    )
+  }
+  if (index === 2) {
+    return (
+      <div className={cn('flex flex-col gap-3 p-4', legacy)}>
+        <div aria-hidden="true" className="h-10 w-full opacity-40 border border-legacy-line" />
+        <Flag className="bg-legacy-bg px-3 py-2 text-[11px]">
+          Tel: +00 000 0000 000 &nbsp;|&nbsp; Fax: +00 000 0000 001 &nbsp;|&nbsp;{' '}
+          <span className="text-legacy-link underline">info@{DEMO_COMPANY.domain}</span>
+          <br />
+          {`© ${DEMO_COMPANY.legacyCopyright} ${DEMO_COMPANY.legalName}`}
+        </Flag>
+      </div>
+    )
+  }
+  return (
+    <div className={cn('flex flex-col items-center gap-2 p-4', legacy)}>
+      <Flag className="flex h-28 w-24 flex-col overflow-hidden rounded-md border-4 border-ink bg-legacy-bg">
+        <div className="h-2 w-[180%] shrink-0 bg-legacy-bar" />
+        <div aria-hidden="true" className="flex w-[180%] flex-col gap-1 p-1">
+          <div className="h-1 w-full bg-legacy-line" />
+          <div className="h-1 w-full bg-legacy-line" />
+          <div className="h-1 w-3/4 bg-legacy-line" />
+        </div>
+      </Flag>
+      <p className="text-[11px] text-ink/70">Best viewed at 1024×768</p>
+    </div>
   )
 }
