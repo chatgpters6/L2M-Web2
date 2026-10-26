@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { ArrowDown, Check, Lock, Monitor, Smartphone } from 'lucide-react'
 import { DemoBadge, Segmented } from '@/components/l2m/brand'
 import { FitWidth } from '@/components/l2m/fit-width'
@@ -22,6 +22,10 @@ export function TransformationsPage() {
   const [page, setPage] = useState<CasePage>('home')
   const [device, setDevice] = useState<Device>('desktop')
   const [active, setActive] = useState<number | null>(0)
+
+  useEffect(() => {
+    if (window.matchMedia('(max-width: 639px)').matches) setDevice('mobile')
+  }, [])
 
   const showChange = (i: number) => {
     setPage('home')
@@ -71,19 +75,19 @@ function Stage({
 
   return (
     <section id={STAGE_ID} aria-labelledby="stage-title" className="scroll-mt-4 border-b border-ink/10">
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-5 py-14 md:px-10 lg:py-20">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex flex-col gap-2">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-ink/60">{p.tr.stageEyebrow}</p>
-            <h2 id="stage-title" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-5 pt-10 pb-14 md:px-10 lg:pt-14 lg:pb-20">
+        <div className="flex flex-col gap-2">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-ink/60">{p.tr.stageEyebrow}</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h2 id="stage-title" className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
               {DEMO_COMPANY.name}
             </h2>
-            <p className="text-sm text-ink/65">{p.tr.stageMeta}</p>
+            <DemoBadge label={p.common.fictional} className="w-fit" />
           </div>
-          <DemoBadge label={p.common.fictional} className="w-fit" />
+          <p className="text-sm text-ink/65">{p.tr.stageMeta}</p>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-lg border border-ink/15 bg-mist/40 p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
+        <div className="flex flex-col gap-2.5 rounded-lg border border-ink/15 bg-mist/40 p-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:p-3">
           <Control label={p.tr.view}>
             <Segmented
               label={p.tr.view}
@@ -141,8 +145,8 @@ function Stage({
 
 function Control({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
-      <span className="font-mono text-[11px] uppercase tracking-wider text-ink/60">{label}</span>
+    <div className="flex items-center gap-3">
+      <span className="w-14 shrink-0 font-mono text-[11px] uppercase tracking-wider text-ink/60 sm:w-auto">{label}</span>
       <div className="max-w-full overflow-x-auto">{children}</div>
     </div>
   )
@@ -221,9 +225,16 @@ function CaseFrame({
             <span className="truncate">{address}</span>
           </div>
         </div>
-        <div className={cn('overflow-y-auto overscroll-contain', compact ? 'h-[360px] md:h-[440px]' : 'h-[420px] md:h-[640px]')} tabIndex={0} aria-label={name}>
+        <div
+          className={cn(
+            'overflow-y-auto overscroll-contain',
+            compact ? 'h-[360px] md:h-[min(560px,calc(100svh-220px))]' : 'h-[420px] md:h-[min(760px,calc(100svh-160px))]',
+          )}
+          tabIndex={0}
+          aria-label={name}
+        >
           {view === 'after' ? (
-            <FitWidth designWidth={1280}>{page === 'home' ? <AfterDesktop {...h} /> : <AfterProductDesktop />}</FitWidth>
+            <FitWidth designWidth={1280} maxZoom={1.12}>{page === 'home' ? <AfterDesktop {...h} /> : <AfterProductDesktop />}</FitWidth>
           ) : (
             legacy
           )}
