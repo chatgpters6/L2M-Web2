@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Logo } from '@/components/l2m/brand'
+import { useSiteLinks } from '@/components/l2m/site-header'
 import { UrlAnalyzer } from '@/components/l2m/url-analyzer'
 import { cn } from '@/lib/utils'
 import { INVITE_INPUT_ID, useHomeCopy } from './home-state'
@@ -34,13 +35,23 @@ export function Invitation() {
 
 export function SiteFooter() {
   const { h } = useHomeCopy()
+  const links = useSiteLinks()
   return (
     <footer className="border-t border-ivory/10 bg-ink text-ivory">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-5 py-10 md:flex-row md:items-center md:justify-between md:px-10">
         <div className="flex flex-col gap-3">
-          <Logo tone="dark" />
+          <Link href="/" aria-label="Legacy2Modern — Home" className="w-fit focus-visible:outline-2 focus-visible:outline-lime">
+            <Logo tone="dark" />
+          </Link>
           <p className="max-w-md text-sm leading-relaxed text-ivory/60">{h.footer.note}</p>
         </div>
+        <nav aria-label="Footer" className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm">
+          {links.map((l) => (
+            <Link key={l.href} href={l.href} className="inline-flex min-h-11 items-center text-ivory/85 underline-offset-4 hover:text-lime hover:underline focus-visible:outline-2 focus-visible:outline-lime">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ivory/70">
           {[h.footer.privacy, h.footer.terms].map((l) => (
             <span key={l} title={h.footer.placeholder} aria-disabled="true">

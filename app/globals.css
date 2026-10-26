@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback', ui-monospace, 'PingFang SC', monospace;
+  --font-sans: 'Geist', 'Geist Fallback', var(--font-noto-sc), 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', ui-monospace, var(--font-noto-sc), monospace;
 
   /* L2M brand palette */
   --color-ink: var(--ink);

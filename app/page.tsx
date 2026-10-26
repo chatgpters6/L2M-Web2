@@ -24,7 +24,7 @@ export default function HomePage() {
     <UrlFlowProvider>
       <HomeDemoProvider>
         <ProtoBar />
-        <SiteHeader tone="dark" inputId={HERO_INPUT_ID} anchors={['#transformation', '#url-to-delivery', '#what-you-get']} />
+        <SiteHeader tone="dark" inputId={HERO_INPUT_ID} />
         <main>
           <Hero />
           <Transformation />
