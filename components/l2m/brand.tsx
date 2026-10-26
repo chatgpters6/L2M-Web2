@@ -62,7 +62,15 @@ export function LangToggle({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
   )
 }
 
-export function DemoBadge({ className, tone = 'light' }: { className?: string; tone?: 'light' | 'dark' }) {
+export function DemoBadge({
+  className,
+  tone = 'light',
+  label,
+}: {
+  className?: string
+  tone?: 'light' | 'dark'
+  label?: string
+}) {
   const { t } = useLang()
   return (
     <span
@@ -73,7 +81,7 @@ export function DemoBadge({ className, tone = 'light' }: { className?: string; t
       )}
     >
       <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
-      {t.flagship.placeholder}
+      {label ?? t.flagship.placeholder}
     </span>
   )
 }

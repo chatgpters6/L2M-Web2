@@ -1,10 +1,11 @@
 'use client'
 
-import { useId, useState, type FormEvent } from 'react'
-import { ArrowRight, Check, CircleAlert, Pencil } from 'lucide-react'
-import { checkUrl, type UrlCheck } from '@/lib/url'
+import { useId, type FormEvent } from 'react'
+import { ArrowLeft, ArrowRight, Check, CircleAlert, Pencil } from 'lucide-react'
+import { checkUrl } from '@/lib/url'
 import { useLang } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
+import { useSharedUrlFlow, useUrlFlowState, type UrlStage } from './url-flow'
 
 type Tone = 'light' | 'dark'
 
@@ -13,29 +14,37 @@ export function UrlAnalyzer({
   inputId,
   className,
   size = 'md',
+  sampleReportHref,
 }: {
   tone?: Tone
   inputId?: string
   className?: string
   size?: 'md' | 'lg'
+  sampleReportHref?: string
 }) {
   const { t } = useLang()
   const generatedId = useId()
   const id = inputId ?? generatedId
   const messageId = `${id}-message`
+  const statusId = `${id}-status`
 
-  const [value, setValue] = useState('')
-  const [result, setResult] = useState<UrlCheck | null>(null)
-  const [submitted, setSubmitted] = useState(false)
+  const shared = useSharedUrlFlow()
+  const local = useUrlFlowState()
+  const { value, setValue, result, setResult, stage, setStage } = shared ?? local
 
   const dark = tone === 'dark'
   const hasError = result !== null && result.state !== 'valid'
+
+  function goTo(next: UrlStage, focusId: string) {
+    setStage(next)
+    requestAnimationFrame(() => document.getElementById(focusId)?.focus())
+  }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const next = checkUrl(value)
     setResult(next)
-    setSubmitted(next.state === 'valid')
+    if (next.state === 'valid') goTo('continue', statusId)
   }
 
   function onChange(next: string) {
@@ -46,45 +55,102 @@ export function UrlAnalyzer({
     }
   }
 
-  if (submitted && result?.state === 'valid') {
+  const cardCls = cn(
+    'flex flex-col gap-4 rounded-lg border p-5 text-left',
+    dark ? 'border-ivory/20 bg-ivory/5 text-ivory' : 'border-ink/15 bg-mist/60 text-ink',
+    className,
+  )
+  const subtle = dark ? 'text-ivory/75' : 'text-muted-foreground'
+  const ghostBtn = cn(
+    'inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium underline-offset-4 hover:underline focus-visible:outline-2',
+    dark ? 'focus-visible:outline-ivory' : 'focus-visible:outline-ink',
+  )
+
+  if (stage !== 'input' && result?.state === 'valid') {
+    if (stage === 'next') {
+      return (
+        <div role="region" aria-labelledby={statusId} className={cardCls}>
+          <span
+            className={cn(
+              'w-fit rounded-sm border px-1.5 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider',
+              dark ? 'border-lime/60 text-lime' : 'border-ink/40 text-ink',
+            )}
+          >
+            {t.url.nextBadge}
+          </span>
+          <div className="flex flex-col gap-1">
+            <p id={statusId} tabIndex={-1} className="text-lg font-semibold outline-none">
+              {t.url.nextTitle}
+            </p>
+            <p className={cn('text-sm', subtle)}>
+              {t.url.nextKept}: <span className="font-mono">{result.normalized}</span>
+            </p>
+          </div>
+          <ol className="flex flex-col">
+            {t.url.nextSteps.map(([step, status], i) => (
+              <li key={step} className={cn('flex items-start gap-3 border-t py-2.5 text-sm', dark ? 'border-ivory/15' : 'border-ink/10')}>
+                <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold', dark ? 'bg-ivory/10 text-ivory' : 'bg-ink/10 text-ink')}>
+                  {i + 1}
+                </span>
+                <span className="flex flex-col">
+                  <span className="font-medium">{step}</span>
+                  <span className={subtle}>{status}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          <div className="flex flex-wrap items-center gap-3">
+            {sampleReportHref && (
+              <a
+                href={sampleReportHref}
+                className="inline-flex min-h-11 items-center gap-2 rounded-md bg-lime px-4 font-semibold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime"
+              >
+                {t.url.nextSample}
+                <ArrowRight className="size-4" aria-hidden="true" />
+              </a>
+            )}
+            <button type="button" onClick={() => goTo('continue', statusId)} className={ghostBtn}>
+              <ArrowLeft className="size-3.5" aria-hidden="true" />
+              {t.url.back}
+            </button>
+            <button type="button" onClick={() => goTo('input', id)} className={ghostBtn}>
+              <Pencil className="size-3.5" aria-hidden="true" />
+              {t.url.edit}
+            </button>
+          </div>
+          <p className="font-mono text-xs uppercase tracking-wide opacity-70">{t.url.demo}</p>
+        </div>
+      )
+    }
+
     return (
-      <div
-        role="status"
-        className={cn(
-          'flex flex-col gap-4 rounded-lg border p-5',
-          dark ? 'border-ivory/20 bg-ivory/5 text-ivory' : 'border-ink/15 bg-mist/60 text-ink',
-          className,
-        )}
-      >
+      <div role="status" className={cardCls}>
         <div className="flex items-start gap-3">
           <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-lime text-ink">
             <Check className="size-4" aria-hidden="true" />
           </span>
           <div className="flex min-w-0 flex-col gap-1">
-            <p className="font-semibold">{t.url.continueTitle}</p>
-            <p className="truncate font-mono text-sm">{result.normalized}</p>
-            <p className={cn('text-sm leading-relaxed', dark ? 'text-ivory/75' : 'text-muted-foreground')}>
-              {t.url.continueBody}
+            <p id={statusId} tabIndex={-1} className="font-semibold outline-none">
+              {t.url.continueTitle}
             </p>
+            <p className="truncate font-mono text-sm">{result.normalized}</p>
+            <p className={cn('text-sm leading-relaxed', subtle)}>{t.url.continueBody}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
+            onClick={() => goTo('next', statusId)}
             aria-describedby={`${id}-demo`}
-            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-lime px-4 font-semibold text-ink outline-offset-2 focus-visible:outline-2 focus-visible:outline-lime"
+            className={cn(
+              'inline-flex min-h-11 items-center gap-2 rounded-md bg-lime px-4 font-semibold text-ink outline-offset-2 focus-visible:outline-2',
+              dark ? 'focus-visible:outline-lime' : 'focus-visible:outline-ink',
+            )}
           >
             {t.url.continueCta}
             <ArrowRight className="size-4" aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            onClick={() => setSubmitted(false)}
-            className={cn(
-              'inline-flex min-h-11 items-center gap-2 rounded-md px-3 text-sm font-medium underline-offset-4 hover:underline focus-visible:outline-2',
-              dark ? 'focus-visible:outline-ivory' : 'focus-visible:outline-ink',
-            )}
-          >
+          <button type="button" onClick={() => goTo('input', id)} className={ghostBtn}>
             <Pencil className="size-3.5" aria-hidden="true" />
             {t.url.edit}
           </button>
@@ -112,8 +178,7 @@ export function UrlAnalyzer({
       </label>
       <div
         className={cn(
-          'flex flex-col gap-2 rounded-lg border p-1.5 sm:flex-row sm:items-center',
-          dark ? 'bg-ivory text-ink' : 'bg-ivory',
+          'flex flex-col gap-2 rounded-lg border bg-ivory p-1.5 text-ink sm:flex-row sm:items-center',
           hasError ? 'border-destructive ring-1 ring-destructive' : dark ? 'border-ivory' : 'border-ink/30',
           'focus-within:ring-2 focus-within:ring-offset-2',
           dark ? 'focus-within:ring-lime focus-within:ring-offset-ink' : 'focus-within:ring-ink focus-within:ring-offset-ivory',

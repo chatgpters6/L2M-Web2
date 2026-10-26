@@ -19,6 +19,8 @@ export function DemoViewport({
   footerSlot,
   className,
   bodyHeight = 'h-[560px]',
+  mobileBodyHeight = 'h-[560px]',
+  badgeLabel,
 }: {
   view: View
   device: Device
@@ -27,6 +29,8 @@ export function DemoViewport({
   footerSlot?: ReactNode
   className?: string
   bodyHeight?: string
+  mobileBodyHeight?: string
+  badgeLabel?: string
 }) {
   const { t } = useLang()
   const h: HotspotProps = { ...hotspots, showHotspots: view === 'after' && hotspots?.showHotspots }
@@ -46,7 +50,7 @@ export function DemoViewport({
             <Lock className="size-2.5" aria-hidden="true" />
             <span className="truncate">{address}</span>
           </div>
-          <div className={cn('overflow-y-auto overscroll-contain rounded-b-[2rem] bg-site-bg', 'h-[560px]')} tabIndex={0} aria-label={label}>
+          <div className={cn('overflow-y-auto overscroll-contain rounded-b-[2rem] bg-site-bg', mobileBodyHeight)} tabIndex={0} aria-label={label}>
             {view === 'after' ? (
               <FitWidth designWidth={375}>
                 <AfterMobile {...h} />
@@ -60,7 +64,7 @@ export function DemoViewport({
               </div>
             )}
           </div>
-          <DemoBadge className="absolute top-14 -left-3" />
+          <DemoBadge label={badgeLabel} className="absolute top-14 -left-3" />
         </div>
         {footerSlot}
       </figure>
@@ -79,7 +83,7 @@ export function DemoViewport({
           <Lock className="size-3 shrink-0" aria-hidden="true" />
           <span className="truncate">{address}</span>
         </div>
-        <DemoBadge className="hidden sm:inline-flex" />
+        <DemoBadge label={badgeLabel} className="hidden sm:inline-flex" />
         {chromeSlot}
       </div>
       <div className={cn('overflow-y-auto overscroll-contain', bodyHeight)} tabIndex={0} aria-label={label}>
